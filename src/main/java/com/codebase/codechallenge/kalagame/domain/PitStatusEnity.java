@@ -8,23 +8,23 @@ import javax.persistence.ManyToOne;
 @Entity
 public class PitStatusEnity {
     @Id
-    int key;
+    String key;
     int value;
     @ManyToOne
     @JoinColumn(name = "game_id")
     GameEntity gameEntity;
 
-    public PitStatusEnity(int key, int value, GameEntity gameEntity) {
+    public PitStatusEnity(String key, int value, GameEntity gameEntity) {
         this.key = key;
         this.value = value;
         this.gameEntity = gameEntity;
     }
 
-    public int getKey() {
+    public String getKey() {
         return key;
     }
 
-    public void setKey(int key) {
+    public void setKey(String key) {
         this.key = key;
     }
 

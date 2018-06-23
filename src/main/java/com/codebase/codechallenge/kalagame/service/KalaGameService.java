@@ -33,8 +33,8 @@ public class KalaGameService {
 
     public MoveOutcomeDTO doMove(Integer gameId, String pitId) {
         Game game= gamePool.get(gameId);
-        Integer currentPlayerId=-1;
         int nextPlayerId=game.doMove(pitId);
+        //TODO update model by using observer and then save the game
         return new MoveOutcomeDTO(gameId,null,game.getStoneStatuse(),game.getCurrentPlayerId(),nextPlayerId);
 
     }

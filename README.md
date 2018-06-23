@@ -22,21 +22,12 @@ Just run the following command:
 
   I exposed two rest service for processing web page url:
    
-    api/filterConfiguration  PUT,DELTE,GET  for manupulating black list
-    api/filterConfiguration/{lookupIp}  GET for checking blacklist for lookupIp
+    games/1025/pits/7  PUT  for moving
+    /games  POST for creating the game
     
-input json sample :
-{
-	"fromIP": "1",
-	"toIP":"192.9.200.16"
-}
- 
- ### Performance consideration
 
- I used parallelstream for concurrently looking for existing blackList Ip range entries.
- I prefered to convert IP into long when I want to look in the blacklist for 
- comparsion optimization .
- 
+
+
  
 
 

@@ -15,7 +15,7 @@ public class KalaGameResource {
 
    }
    @RequestMapping(method=RequestMethod.POST)
-   public long creatGame(){
+   public long createGame(){
        return kalaGameService.createGame();
 
       

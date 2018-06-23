@@ -27,6 +27,8 @@ class Player {
      * @return If the player ha9s another go
      */
     public int doMove(String pit, Board board, boolean update) {
+        if (getPlayerKalaIndex(number).equals(pit))
+            throw new IllegalArgumentException("You can not peak any stone from your house!");
         Integer nextPlayerId = (number==0?1:0);  //by default next player is opponent player!
         int numberOfStonesInThePit = board.getPits().get(pit);
         if (numberOfStonesInThePit == 0)
