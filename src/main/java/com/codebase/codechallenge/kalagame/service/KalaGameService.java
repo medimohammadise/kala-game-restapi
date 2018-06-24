@@ -36,6 +36,9 @@ public class KalaGameService {
         int nextPlayerId=game.doMove(pitId);
         //TODO update model by using observer and then save the game
         return new MoveOutcomeDTO(gameId,null,game.getStoneStatuse(),game.getCurrentPlayerId(),nextPlayerId);
-
     }
+    public Map<Integer, Game> listAvailableGames(){
+        return gamePool;
+    }
+
 }
