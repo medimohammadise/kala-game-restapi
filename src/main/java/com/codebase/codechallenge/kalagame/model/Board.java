@@ -51,6 +51,16 @@ class Board {
     }
 
     /**
+     * Add a bead to a cup at the given index
+     *
+     * @param index
+     */
+    public void addStonesToPit(String index,int numberofStonesToAdd) {
+        pits.put(index, pits.get(index) + numberofStonesToAdd);
+    }
+
+
+    /**
      * Clear the beads in a given cup
      *
      * @param index

@@ -50,7 +50,7 @@ public class Game {
         if (requestedPlayerId==nextPlayerId)
             currentPlayerId=requestedPlayerId;
         else
-            throw new RuntimeException("It is not your turn, it is player= "+nextPlayerId+" turn!");
+            throw new IllegalArgumentException("It is not your turn, it is player= "+nextPlayerId+" turn!");
         nextPlayerId= players[currentPlayerId].doMove(pitId,borad,false);
         return nextPlayerId;
 
@@ -60,5 +60,9 @@ public class Game {
     }
     public int getCurrentPlayerId(){
         return  currentPlayerId;
+    }
+
+    public GameEntity getGameEntity() {
+        return gameEntity;
     }
 }

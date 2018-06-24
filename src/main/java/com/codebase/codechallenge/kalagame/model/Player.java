@@ -1,6 +1,7 @@
 package com.codebase.codechallenge.kalagame.model;
 
-import com.codebase.codechallenge.kalagame.model.Board;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 class Player {
@@ -8,7 +9,7 @@ class Player {
      * Player number
      */
     protected int number;
-
+    Logger log= LoggerFactory.getLogger(getClass());
     /**
      * Create a numbered player
      *
@@ -39,8 +40,9 @@ class Player {
             pitCounter++; //go ahead with subsequet pits couter clockwise
             if (String.valueOf(pitCounter).equals(getOtherPlayerKalaIndexToAvoid(number)))
                 pitCounter++; // don't put stone in other players Kala,avoid it!
-            if (pitCounter >= board.getPits().size())
+            if (pitCounter > board.getPits().size())
                 pitCounter = pitCounter - board.getPits().size();
+            log.info("adding stone into pit number "+pitCounter);
             board.addStoneToPit(String.valueOf(pitCounter));
         }
         if (isPlayeMoveLeadToPlayerKala(number, pit))
@@ -49,7 +51,7 @@ class Player {
             board.addStoneToPit(getPlayerKalaIndex(number));
             board.clearPit(pit);
             if (board.getPits().get(getOppositPit(pit)) > 0) {
-                board.addStoneToPit(getOppositPit(pit));
+                board.addStonesToPit(getPlayerKalaIndex(number), board.getPits().get(getOppositPit(pit)));
                 board.clearPit(getOppositPit(pit));
             }
         }

@@ -31,14 +31,28 @@ public class KalaGameService {
         return gameEntity.getId();
     }
 
+    @Transactional
     public MoveOutcomeDTO doMove(Integer gameId, String pitId) {
         Game game= gamePool.get(gameId);
+        if (game==null) throw new RuntimeException("Game does not exists");  //TODO Not FOUND
         int nextPlayerId=game.doMove(pitId);
         //TODO update model by using observer and then save the game
-        return new MoveOutcomeDTO(gameId,null,game.getStoneStatuse(),game.getCurrentPlayerId(),nextPlayerId);
+        MoveOutcomeDTO moveOutcomeDTO= new MoveOutcomeDTO(gameId,null,game.getStoneStatuse(),game.getCurrentPlayerId(),nextPlayerId);
+        //saveState(game);
+        return moveOutcomeDTO;
+    }
+
+    private void saveState( Game game) {
+        game.getGameEntity().setPits(game.getStoneStatuse());
+        kalaGameRepository.save(game.getGameEntity());
+
     }
     public Map<Integer, Game> listAvailableGames(){
         return gamePool;
+    }
+
+    public Game getGame(int gameId){
+        return gamePool.get(gameId);
     }
 
 }

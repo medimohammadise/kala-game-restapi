@@ -1,6 +1,9 @@
 package com.codebase.codechallenge.kalagame.domain;
 
+import org.hibernate.annotations.BatchSize;
+
 import javax.persistence.*;
+import java.util.Map;
 
 @Entity
 public class GameEntity {
@@ -8,16 +11,19 @@ public class GameEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @OrderColumn
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "gameEntity")
-    PitStatusEnity[] pitsStatus;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @MapKeyColumn(name = "pit_key")
+    @Column(name = "pit_value")
+    @BatchSize(size = 14)
+    Map<String,Integer> pits;
 
     public GameEntity() {
     }
 
-    public GameEntity(Integer id, PitStatusEnity[] pitsStatus) {
+    public GameEntity(Integer id, Map<String,Integer>  pits) {
         this.id = id;
-        this.pitsStatus = pitsStatus;
+        this.pits = pits;
     }
 
     public Integer getId() {
@@ -28,11 +34,11 @@ public class GameEntity {
         this.id = id;
     }
 
-    public PitStatusEnity[] getPitsStatus() {
-        return pitsStatus;
+    public Map<String, Integer> getPits() {
+        return pits;
     }
 
-    public void setPitsStatus(PitStatusEnity[] pitsStatus) {
-        this.pitsStatus = pitsStatus;
+    public void setPits(Map<String, Integer> pits) {
+        this.pits = pits;
     }
 }
