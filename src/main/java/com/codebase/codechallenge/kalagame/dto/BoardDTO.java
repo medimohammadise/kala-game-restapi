@@ -1,10 +1,14 @@
 package com.codebase.codechallenge.kalagame.dto;
 
+import com.codebase.codechallenge.kalagame.utils.NumberStringComparator;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class BoardDTO {
-    private Map<String, Integer> pits=new HashMap<>();
+    private Map<String, Integer> pits=new TreeMap<>(new NumberStringComparator());
 
     public BoardDTO() {
     }

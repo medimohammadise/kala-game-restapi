@@ -2,30 +2,31 @@ package com.codebase.codechallenge.kalagame.dto;
 
 
 
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.Map;
 
 public class MoveOutcomeDTO {
     int gameId;
-    URL gameURL;
+    URI gameURL;
     int currentPalyer;
     int nextPlayerTurn;
+    String selectedPitIndex;
     Map<String,Integer> pitsStatus;
+    public MoveOutcomeDTO(){
 
-    public MoveOutcomeDTO(int gameId, URL gameURL, Map<String,Integer> pitsStatus,int currentPalyer,int nextPlayerTurn) {
+    }
+    public MoveOutcomeDTO(int gameId, Map<String,Integer> pitsStatus,int currentPalyer,int nextPlayerTurn,String selectedPitIndex) {
         this.gameId = gameId;
         this.gameURL = gameURL;
         this.pitsStatus = pitsStatus;
         this.currentPalyer=currentPalyer;
         this.nextPlayerTurn=nextPlayerTurn;
+        this.selectedPitIndex=selectedPitIndex;
         try {
-            this.gameURL=new URL("https://" +InetAddress.getLocalHost().getHostAddress()+"/"+"games/"+String.valueOf(gameId));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+            this.gameURL=new URI("https://" +InetAddress.getLocalHost().getHostAddress()+"/"+"games/"+String.valueOf(gameId)+"/pits/"+selectedPitIndex);
         } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
     }
@@ -38,11 +39,11 @@ public class MoveOutcomeDTO {
         this.gameId = gameId;
     }
 
-    public URL getGameURL() {
+    public URI getGameURL() {
         return gameURL;
     }
 
-    public void setGameURL(URL gameURL) {
+    public void setGameURL(URI gameURL) {
         this.gameURL = gameURL;
     }
 

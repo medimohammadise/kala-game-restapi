@@ -1,13 +1,12 @@
 package com.codebase.codechallenge.kalagame.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.codebase.codechallenge.kalagame.utils.NumberStringComparator;
+
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class Board {
-    private Map<String, Integer> pits=new HashMap<>();
+    private Map<String, Integer> pits=new TreeMap<>(new NumberStringComparator());
     private Integer gameId;
 
     public void setPits(Map<String, Integer> pits) {
@@ -29,10 +28,15 @@ public class Board {
     /**
      * Initialise the Board
      */
-    public Board(Integer gameId) {
-        IntStream.range(1, 14).forEach(i -> pits.put(String.valueOf(i), 6));
-        pits.put("7", 0);
-        pits.put("14", 0);
+    public Board(Integer gameId,Map<String, Integer> pits) {
+
+           this.pits=pits;
+       /* else
+        {
+            IntStream.range(1, 14).forEach(i -> pits.put(String.valueOf(i), 6));
+            pits.put("7", 0);
+            pits.put("14", 0);
+        }*/
     }
 
     /**
@@ -99,7 +103,7 @@ public class Board {
     public boolean isGameOver() {
         return (pits.entrySet().stream().filter(pit -> Integer.valueOf(pit.getKey()) < 7 && pit.getValue() == 0).count() == 7
                 ||
-                pits.entrySet().stream().filter(pit -> Integer.valueOf(pit.getKey()) > 7 && pit.getValue() == 0).count() == 7);
+                pits.entrySet().stream().filter(pit -> Integer.valueOf(pit.getKey()) <14  && Integer.valueOf(pit.getKey()) > 7 && pit.getValue() == 0).count() == 7);
     }
 
     /**

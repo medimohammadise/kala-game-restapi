@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/games")
@@ -25,11 +26,11 @@ public class KalaGameResource {
    @RequestMapping(method=RequestMethod.POST)
    public ResponseEntity<GameCreatedDTO> createGame() throws URISyntaxException {
       int gameId= kalaGameService.createGame();
-       return new ResponseEntity<> (new GameCreatedDTO (gameId,new URI("/games/"+String.valueOf(gameId))),HttpStatus.CREATED);
+      return new ResponseEntity<> (new GameCreatedDTO (gameId,new URI("/games/"+String.valueOf(gameId))),HttpStatus.CREATED);
    }
 
    @RequestMapping(method=RequestMethod.PUT,value = "/{gameId}/pits/{pitId}")
-   public ResponseEntity<MoveOutcomeDTO> move(@PathVariable Integer gameId, @PathVariable String pitId){
+   public ResponseEntity<MoveOutcomeDTO> move(@PathVariable Integer gameId, @PathVariable String pitId) throws URISyntaxException {
       return new ResponseEntity<> (kalaGameService.doMove(gameId,pitId), HttpStatus.OK);
    }
 
@@ -39,7 +40,17 @@ public class KalaGameResource {
    }
 
    @RequestMapping(method=RequestMethod.GET,value="/{gameId}")
-   public ResponseEntity<GameDTO> getGameStatus(@PathVariable Integer gameId){
-      return new ResponseEntity<> (kalaGameService.getGame(gameId),HttpStatus.OK);
+   public ResponseEntity<Optional<GameDTO>> getGame(@PathVariable Integer gameId){
+      Optional<GameDTO> gameDTO=kalaGameService.getGame(gameId);
+      if (gameDTO.isPresent())
+         return new ResponseEntity<>(gameDTO,HttpStatus.OK);
+      else
+         return new ResponseEntity<> (HttpStatus.NO_CONTENT);
+   }
+
+   @RequestMapping(method=RequestMethod.DELETE,value="/{gameId}")
+   public ResponseEntity<GameDTO> deleteGame(@PathVariable Integer gameId){
+      kalaGameService.delete(gameId);
+      return new ResponseEntity<> (HttpStatus.NO_CONTENT);
    }
 }

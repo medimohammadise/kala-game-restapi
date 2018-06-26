@@ -7,6 +7,14 @@ public class GameDTO {
     int nextPlayer;
     PlayerDTO[] players;
 
+    public void setCurrentPlayer(int currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public void setNextPlayer(int nextPlayer) {
+        this.nextPlayer = nextPlayer;
+    }
+
     public GameDTO() {
     }
 

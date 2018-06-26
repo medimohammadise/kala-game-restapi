@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 @org.springframework.stereotype.Repository
-public interface KalaGameRepository extends JpaRepository<GameEntity,Long> {
+public interface KalaGameRepository extends JpaRepository<GameEntity,Integer> {
 
 }

@@ -5,6 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 public class Player {
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
     /**
      * Player number
      */
@@ -46,8 +50,10 @@ public class Player {
         int pitCounter=Integer.valueOf(pit);
         for (; numberOfStonesInThePit > 0; numberOfStonesInThePit--) {
             pitCounter++; //go ahead with subsequet pits couter clockwise
-            if (String.valueOf(pitCounter).equals(getOtherPlayerKalaIndexToAvoid(number)))
+            if (String.valueOf(pitCounter).equals(getOtherPlayerKalaIndexToAvoid(number))) {
                 pitCounter++; // don't put stone in other players Kala,avoid it!
+                log.info("player "+number+" kala "+pitCounter +" avoided");
+            }
             if (pitCounter > board.getPits().size())
                 pitCounter = pitCounter - board.getPits().size();
             log.info("adding stone into pit number "+pitCounter);
