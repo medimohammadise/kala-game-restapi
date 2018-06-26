@@ -1,5 +1,7 @@
 package com.codebase.codechallenge.kalagame.rest;
 
+import com.codebase.codechallenge.kalagame.dto.GameCreatedDTO;
+import com.codebase.codechallenge.kalagame.dto.GameDTO;
 import com.codebase.codechallenge.kalagame.dto.MoveOutcomeDTO;
 import com.codebase.codechallenge.kalagame.model.Game;
 import com.codebase.codechallenge.kalagame.service.KalaGameService;
@@ -7,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +23,9 @@ public class KalaGameResource {
 
    }
    @RequestMapping(method=RequestMethod.POST)
-   public long createGame(){
-       return kalaGameService.createGame();
+   public ResponseEntity<GameCreatedDTO> createGame() throws URISyntaxException {
+      int gameId= kalaGameService.createGame();
+       return new ResponseEntity<> (new GameCreatedDTO (gameId,new URI("/games/"+String.valueOf(gameId))),HttpStatus.CREATED);
    }
 
    @RequestMapping(method=RequestMethod.PUT,value = "/{gameId}/pits/{pitId}")
@@ -29,12 +34,12 @@ public class KalaGameResource {
    }
 
    @RequestMapping(method=RequestMethod.GET)
-   public Map<Integer,Game> listAvailableGames(){
+   public Map<Integer,GameDTO> listAvailableGames(){
       return kalaGameService.listAvailableGames();
    }
 
    @RequestMapping(method=RequestMethod.GET,value="/{gameId}")
-   public ResponseEntity<Game> getGameStatus(@PathVariable Integer gameId){
+   public ResponseEntity<GameDTO> getGameStatus(@PathVariable Integer gameId){
       return new ResponseEntity<> (kalaGameService.getGame(gameId),HttpStatus.OK);
    }
 }

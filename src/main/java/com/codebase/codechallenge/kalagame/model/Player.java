@@ -4,12 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-class Player {
+public class Player {
     /**
      * Player number
      */
     protected int number;
     Logger log= LoggerFactory.getLogger(getClass());
+
+    public Player(){
+
+    }
     /**
      * Create a numbered player
      *
@@ -17,6 +21,10 @@ class Player {
      */
     public Player(int number) {
         this.number = number;
+    }
+
+    public int getNumber() {
+        return number;
     }
 
     /**

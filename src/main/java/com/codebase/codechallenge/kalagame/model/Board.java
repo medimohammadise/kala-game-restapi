@@ -6,11 +6,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-class Board {
+public class Board {
     private Map<String, Integer> pits=new HashMap<>();
     private Integer gameId;
-    //TODO  numbers should be fetch from property file
 
+    public void setPits(Map<String, Integer> pits) {
+        this.pits = pits;
+    }
+
+    public Integer getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(Integer gameId) {
+        this.gameId = gameId;
+    }
+    //TODO  numbers should be fetch from property file
+    public Board(){
+
+
+    }
     /**
      * Initialise the Board
      */

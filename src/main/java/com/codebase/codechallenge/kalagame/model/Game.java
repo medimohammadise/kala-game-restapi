@@ -6,15 +6,18 @@ import java.util.Map;
 
 public class Game {
     Integer gameId;
-    Board borad;
+    Board board;
     Player[] players=new Player[2];
     GameEntity gameEntity;
-    int currentPlayerId;
-    int nextPlayerId;
+    int currentPlayer;
+    int nextPlayer;
+    public Game(){
+
+    }
     public Game(GameEntity gameEntity) {
         this.gameId = gameEntity.getId();
         //TODO pass game state to the board
-        this.borad=new Board(gameId);
+        this.board=new Board(gameId);
         players[0]=new Player(0);
         players[1]=new Player(1);
         this.gameEntity = gameEntity;
@@ -28,12 +31,12 @@ public class Game {
         this.gameId = gameId;
     }
 
-    public Board getBorad() {
-        return borad;
+    public Board getBoard() {
+        return board;
     }
 
-    public void setBorad(Board borad) {
-        this.borad = borad;
+    public void setBoard(Board borad) {
+        this.board = borad;
     }
 
     public Player[] getPlayers() {
@@ -46,20 +49,20 @@ public class Game {
 
     public int doMove(String pitId) {
 
-        int requestedPlayerId=borad.whoIsThisPit(pitId);
-        if (requestedPlayerId==nextPlayerId)
-            currentPlayerId=requestedPlayerId;
+        int requestedPlayerId=board.whoIsThisPit(pitId);
+        if (requestedPlayerId== nextPlayer)
+            currentPlayer =requestedPlayerId;
         else
-            throw new IllegalArgumentException("It is not your turn, it is player= "+nextPlayerId+" turn!");
-        nextPlayerId= players[currentPlayerId].doMove(pitId,borad,false);
-        return nextPlayerId;
+            throw new IllegalArgumentException("It is not your turn, it is player= "+ nextPlayer +" turn!");
+        nextPlayer = players[currentPlayer].doMove(pitId,board,false);
+        return nextPlayer;
 
     }
     public Map<String,Integer> getStoneStatuse(){
-        return borad.getPits();
+        return board.getPits();
     }
-    public int getCurrentPlayerId(){
-        return  currentPlayerId;
+    public int getCurrentPlayer(){
+        return currentPlayer;
     }
 
     public GameEntity getGameEntity() {
