@@ -101,9 +101,9 @@ public class Board {
      * @return true If the game is over
      */
     public boolean isGameOver() {
-        return (pits.entrySet().stream().filter(pit -> Integer.valueOf(pit.getKey()) < 7 && pit.getValue() == 0).count() == 7
+        return (pits.entrySet().stream().filter(pit -> Integer.valueOf(pit.getKey()) < 7 && pit.getValue() == 0).count() ==6
                 ||
-                pits.entrySet().stream().filter(pit -> Integer.valueOf(pit.getKey()) <14  && Integer.valueOf(pit.getKey()) > 7 && pit.getValue() == 0).count() == 7);
+                pits.entrySet().stream().filter(pit -> Integer.valueOf(pit.getKey()) <14  && Integer.valueOf(pit.getKey()) > 7 && pit.getValue() == 0).count() == 6);
     }
 
     /**
@@ -113,12 +113,14 @@ public class Board {
      * @return An array containing the indexes of the cups that can be moved by a
      * player
      */
-    public List<Integer> getAvailablePitsForMove(int player) {
-        List<Integer> availablePitsForMove = new ArrayList();
+    public List<String> getAvailablePitsForMove(int player) {
+        List<String> availablePitsForMove = new ArrayList();
+        String availableIndex="";
         for (int i = 1; i < 7; i++) {
-            if (pits.get(getPitIndexForPlayer(player, String.valueOf(i))) > 0) {
+            availableIndex=getPitIndexForPlayer(player, String.valueOf(i));
+            if (pits.get(availableIndex) > 0) {
                 // add a new move
-                availablePitsForMove.add(i);
+                availablePitsForMove.add(availableIndex);
             }
         }
         return availablePitsForMove;

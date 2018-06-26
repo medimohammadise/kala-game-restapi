@@ -126,9 +126,9 @@ public class Player {
 
 
 
-    public  boolean checkChoosenPitValidForMove(Board board,int choosenPit){
-        List<Integer> AvailablePitsForMove =board.getAvailablePitsForMove(number);
-        return AvailablePitsForMove.stream().filter(moveAbalePit->choosenPit==choosenPit).findFirst().isPresent();
+    public  boolean checkChoosenPitValidForMove(Board board,String choosenPit){
+        List<String> AvailablePitsForMove =board.getAvailablePitsForMove(number);
+        return AvailablePitsForMove.stream().filter(moveAbalePit->moveAbalePit.equals(choosenPit)).findFirst().isPresent();
     }
 
 }
