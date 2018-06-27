@@ -2,6 +2,8 @@ package com.codebase.codechallenge.kalagame.dto;
 
 
 
+import com.codebase.codechallenge.kalagame.model.Game;
+
 import java.net.*;
 import java.util.Map;
 
@@ -15,12 +17,12 @@ public class MoveOutcomeDTO {
     public MoveOutcomeDTO(){
 
     }
-    public MoveOutcomeDTO(int gameId, Map<String,Integer> pitsStatus,int currentPalyer,int nextPlayerTurn,String selectedPitIndex) {
-        this.gameId = gameId;
-        this.gameURL = gameURL;
-        this.pitsStatus = pitsStatus;
-        this.currentPalyer=currentPalyer;
-        this.nextPlayerTurn=nextPlayerTurn;
+    public MoveOutcomeDTO(GameDTO gameDTO, String selectedPitIndex) throws URISyntaxException {
+        this.gameId = gameDTO.getGameId();
+        this.gameURL = new URI("/games/"+gameDTO.getGameId()+"/"+"pits/"+selectedPitIndex);
+        this.pitsStatus = gameDTO.getBoardDTO().getPits();
+        this.currentPalyer=gameDTO.getCurrentPlayer();
+        this.nextPlayerTurn=gameDTO.getNextPlayer();
         this.selectedPitIndex=selectedPitIndex;
         try {
             this.gameURL=new URI("https://" +InetAddress.getLocalHost().getHostAddress()+"/"+"games/"+String.valueOf(gameId)+"/pits/"+selectedPitIndex);

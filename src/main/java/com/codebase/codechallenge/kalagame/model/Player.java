@@ -59,14 +59,14 @@ public class Player {
             log.info("adding stone into pit number "+pitCounter);
             board.addStoneToPit(String.valueOf(pitCounter));
         }
-        if (isPlayeMoveLeadToPlayerKala(number, pit))
+        if (isPlayeMoveLeadToPlayerKala(number, String.valueOf(pitCounter)))
             nextPlayerId = number;
-        else if (board.getPits().get(pit) == 1) {
+        else if (board.getPits().get(String.valueOf(pitCounter)) == 1) {
             board.addStoneToPit(getPlayerKalaIndex(number));
-            board.clearPit(pit);
-            if (board.getPits().get(getOppositPit(pit)) > 0) {
-                board.addStonesToPit(getPlayerKalaIndex(number), board.getPits().get(getOppositPit(pit)));
-                board.clearPit(getOppositPit(pit));
+            board.clearPit(String.valueOf(pitCounter));
+            if (board.getPits().get(getOppositPit(String.valueOf(pitCounter))) > 0) {
+                board.addStonesToPit(getPlayerKalaIndex(number), board.getPits().get(getOppositPit(String.valueOf(pitCounter))));
+                board.clearPit(getOppositPit(String.valueOf(pitCounter)));
             }
         }
         return nextPlayerId;
@@ -117,10 +117,10 @@ public class Player {
      */
     private String getOppositPit(String pit) {
         int pitIndex=Integer.valueOf(pit);
-        if (number==0)
-            return String.valueOf(pitIndex+7);
+        if (pitIndex>7)
+            return String.valueOf(pitIndex-7);
         else
-           return String.valueOf(pitIndex-7);
+           return String.valueOf(pitIndex+7);
 
     }
 

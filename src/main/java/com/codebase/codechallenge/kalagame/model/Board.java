@@ -1,12 +1,11 @@
 package com.codebase.codechallenge.kalagame.model;
 
-import com.codebase.codechallenge.kalagame.utils.NumberStringComparator;
-
-import java.util.*;
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class Board {
-    private Map<String, Integer> pits=new TreeMap<>(new NumberStringComparator());
+    private Map<String, Integer> pits;
     private Integer gameId;
 
     public void setPits(Map<String, Integer> pits) {
@@ -20,7 +19,6 @@ public class Board {
     public void setGameId(Integer gameId) {
         this.gameId = gameId;
     }
-    //TODO  numbers should be fetch from property file
     public Board(){
 
 
@@ -29,21 +27,15 @@ public class Board {
      * Initialise the Board
      */
     public Board(Integer gameId,Map<String, Integer> pits) {
-
+            this.gameId=gameId;
            this.pits=pits;
-       /* else
-        {
-            IntStream.range(1, 14).forEach(i -> pits.put(String.valueOf(i), 6));
-            pits.put("7", 0);
-            pits.put("14", 0);
-        }*/
     }
 
     /**
-     * The board index of a players cup
+     * The board index of a players
      *
      * @param player The player (0 or 1)
-     * @param cup    The cup index (0 to 5)
+     * @param pits    The cup index (1 to 6)
      * @return The real index of the cup (0 to 13)
      */
     private String getPitIndexForPlayer(int player, String pit) {

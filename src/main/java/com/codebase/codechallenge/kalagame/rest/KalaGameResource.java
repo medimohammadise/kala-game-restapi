@@ -35,8 +35,13 @@ public class KalaGameResource {
    }
 
    @RequestMapping(method=RequestMethod.GET)
-   public Map<Integer,GameDTO> listAvailableGames(){
-      return kalaGameService.listAvailableGames();
+   public ResponseEntity<List<GameDTO>> listAvailableGames(){
+
+      List<GameDTO> allGames= kalaGameService.listAvailableGames();
+      if (allGames.size()>0)
+         return new ResponseEntity<>(allGames,HttpStatus.OK);
+      else
+         return new ResponseEntity<> (HttpStatus.NO_CONTENT);
    }
 
    @RequestMapping(method=RequestMethod.GET,value="/{gameId}")
@@ -51,6 +56,11 @@ public class KalaGameResource {
    @RequestMapping(method=RequestMethod.DELETE,value="/{gameId}")
    public ResponseEntity<GameDTO> deleteGame(@PathVariable Integer gameId){
       kalaGameService.delete(gameId);
+      return new ResponseEntity<> (HttpStatus.NO_CONTENT);
+   }
+   @RequestMapping(method=RequestMethod.DELETE)
+   public ResponseEntity<GameDTO> deleteAllGame(){
+      kalaGameService.deleteAll();
       return new ResponseEntity<> (HttpStatus.NO_CONTENT);
    }
 }

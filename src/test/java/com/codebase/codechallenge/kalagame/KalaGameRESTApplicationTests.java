@@ -6,10 +6,7 @@ import com.codebase.codechallenge.kalagame.mapper.GameMapper;
 import com.codebase.codechallenge.kalagame.model.Game;
 import com.codebase.codechallenge.kalagame.rest.KalaGameResource;
 import com.codebase.codechallenge.kalagame.service.KalaGameService;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -21,14 +18,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Propagation;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Random;
-
 
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
@@ -39,12 +39,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Transactional
 public class KalaGameRESTApplicationTests {
 	Logger log= LoggerFactory.getLogger(getClass());
-	@Test
-	public void contextLoads() {
-	}
-	static int createGameId;
+	//set value = -1 to create new game and play until win or set your gameId to play
+	static int createGameId=3329;
 	@Autowired
 	KalaGameService kalaGameService;
 
@@ -65,9 +64,11 @@ public class KalaGameRESTApplicationTests {
 
 	@Test
 	public void createGame() throws Exception {
-		MvcResult result= restKalaGameMockMvc.perform(post("/games")).andExpect(status().isCreated()).andDo(print()).andReturn();
-		JSONObject jsonObject=new  JSONObject(result.getResponse().getContentAsString());
-		createGameId=jsonObject.getInt("id");
+		if (createGameId==-1) {
+			MvcResult result = restKalaGameMockMvc.perform(post("/games")).andExpect(status().isCreated()).andDo(print()).andReturn();
+			JSONObject jsonObject = new JSONObject(result.getResponse().getContentAsString());
+			createGameId = jsonObject.getInt("id");
+		}
 	}
 
 
@@ -81,25 +82,30 @@ public class KalaGameRESTApplicationTests {
 			return "";
 
 	}
+
 	@Test
+	@Transactional(Transactional.TxType.REQUIRES_NEW)
+	@Commit   // I do not want Junit to rollback my transaction I want to play and win and check the result
 	public void playGameUntilWin() throws Exception {
 		int currentPlayer=0;
 		MoveOutcomeDTO moveOutcomeDTO=null;
 		ObjectMapper mapper = new ObjectMapper();
-		//mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-		//mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 		Game game=null;
 		MvcResult result=null;
 		GameDTO gameDTO=null;
+		result=restKalaGameMockMvc.perform(get("/games/"+createGameId)).andExpect(status().isOk()).andDo(print()).andReturn();
+		gameDTO=mapper.readValue(result.getResponse().getContentAsString(),GameDTO.class);
+		game=gameMapper.gameDToGame(gameDTO);
        do {
-		   result=restKalaGameMockMvc.perform(get("/games/"+createGameId)).andExpect(status().isOk()).andDo(print()).andReturn();
-		    gameDTO=mapper.readValue(result.getResponse().getContentAsString(),GameDTO.class);
-		    game=gameMapper.gameDToGame(gameDTO);
+
             String selectedPit = chooseRandomPitForPlayer(game, currentPlayer);
 		     log.info("selected pit ="+selectedPit );
             result = restKalaGameMockMvc.perform(put("/games/" + createGameId + "/pits/" + selectedPit)).andExpect(status().isOk()).andDo(print()).andReturn();
 		   	moveOutcomeDTO= mapper.readValue(result.getResponse().getContentAsString(), MoveOutcomeDTO.class);
             currentPlayer = moveOutcomeDTO.getNextPlayerTurn();
+		   result=restKalaGameMockMvc.perform(get("/games/"+createGameId)).andExpect(status().isOk()).andDo(print()).andReturn();
+		   gameDTO=mapper.readValue(result.getResponse().getContentAsString(),GameDTO.class);
+		   game=gameMapper.gameDToGame(gameDTO);
         }
         while((!game.getBoard().isGameOver()));
 	}

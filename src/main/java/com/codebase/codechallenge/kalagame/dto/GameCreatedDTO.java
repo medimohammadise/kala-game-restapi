@@ -1,14 +1,15 @@
 package com.codebase.codechallenge.kalagame.dto;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 public class GameCreatedDTO {
     int id;
     URI uri;
 
-    public GameCreatedDTO(int id, URI uri) {
+    public GameCreatedDTO(int id, URI uri) throws URISyntaxException {
         this.id = id;
-        this.uri = uri;
+        this.uri = new URI("/games/"+String.valueOf(id));
     }
 
     public int getId() {

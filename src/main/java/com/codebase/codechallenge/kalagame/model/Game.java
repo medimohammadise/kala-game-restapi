@@ -28,6 +28,8 @@ public class Game {
 
 
     public Game(){
+        players[0]=new Player(0);
+        players[1]=new Player(1);
 
     }
     public Game(int gameId,Map<String,Integer> pits) {
@@ -63,14 +65,18 @@ public class Game {
     }
 
     public void doMove(String pitId) {
-        log.info("currentPlayer " +currentPlayer+" nextPlayer "+nextPlayer);
-        int requestedPlayerId=board.whoIsThisPit(pitId);
-        if (nextPlayer!=-1 && requestedPlayerId!= nextPlayer)
-            throw new IllegalArgumentException("It is not your turn, it is player= "+ nextPlayer +" turn!");
+        if (!board.isGameOver()) {
+            log.info("currentPlayer " + currentPlayer + " nextPlayer " + nextPlayer);
+            int requestedPlayerId = board.whoIsThisPit(pitId);
+            if (nextPlayer != -1 && requestedPlayerId != nextPlayer)
+                throw new IllegalArgumentException("It is not your turn, it is player= " + nextPlayer + " turn!");
+            else
+                currentPlayer = requestedPlayerId;
+            log.info("currentPlayer playing ---> " + currentPlayer);
+            nextPlayer = players[currentPlayer].doMove(pitId, board, false);
+        }
         else
-             currentPlayer =requestedPlayerId;
-        log.info("currentPlayer playing ---> "+currentPlayer);
-                nextPlayer = players[currentPlayer].doMove(pitId,board,false);
+            throw new IllegalArgumentException("game is over");
     }
     public Map<String,Integer> getStoneStatuse(){
         return board.getPits();

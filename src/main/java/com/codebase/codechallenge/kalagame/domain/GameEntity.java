@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.IntStream;
 
-@Entity
+@Entity(name="game")
 public class GameEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -3,19 +3,20 @@ package com.codebase.codechallenge.kalagame.service;
 import com.codebase.codechallenge.kalagame.domain.GameEntity;
 import com.codebase.codechallenge.kalagame.dto.GameDTO;
 import com.codebase.codechallenge.kalagame.dto.MoveOutcomeDTO;
+import com.codebase.codechallenge.kalagame.mapper.GameEntityMapper;
 import com.codebase.codechallenge.kalagame.mapper.GameMapper;
 import com.codebase.codechallenge.kalagame.model.Game;
 import com.codebase.codechallenge.kalagame.repository.KalaGameRepository;
-import com.codebase.codechallenge.kalagame.utils.NumberStringComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.IntStream;
 
 @Service
@@ -23,14 +24,15 @@ public class KalaGameService {
     Logger log= LoggerFactory.getLogger(getClass());
     KalaGameRepository kalaGameRepository;
     GameMapper gameMapper;
-    Map<Integer, GameDTO> gamePool=new HashMap<>();
+    GameEntityMapper gameEntityMapper;
     public KalaGameService(
             KalaGameRepository kalaGameRepository,
-            GameMapper gameMapper
+            GameMapper gameMapper,
+            GameEntityMapper gameEntityMapper
     ) {
         this.kalaGameRepository = kalaGameRepository;
         this.gameMapper=gameMapper;
-        refreshGamingPool();
+        this.gameEntityMapper=gameEntityMapper;
     }
 
     @Transactional
@@ -44,47 +46,57 @@ public class KalaGameService {
         gameEntity.setPits(pits);
         kalaGameRepository.save(gameEntity);
         Game game = new Game(gameEntity.getId(),gameEntity.getPits());
-        gamePool.put(gameEntity.getId(),gameMapper.gameToDTO(game));
         return gameEntity.getId();
     }
 
     @Transactional
-    public MoveOutcomeDTO doMove(Integer gameId, String pitId) throws URISyntaxException {
-        GameDTO gameDTO= gamePool.get(gameId);
-
-        if (gameDTO==null) throw new RuntimeException("Game does not exists");  //TODO Not FOUND
-        Game game=gameMapper.gameDToGame(gameDTO);
-        game.doMove(pitId);
+    public MoveOutcomeDTO doMove(int gameId, String selectedPitId) throws URISyntaxException {
+        Optional<GameEntity> gameEntity=kalaGameRepository.findById(gameId);
+        if (!gameEntity.isPresent()) throw new IllegalArgumentException("Game does not exists");
+        Game game=gameEntityMapper.gameEntityToGame(gameEntity.get());
+        game.doMove(selectedPitId);
         saveState(game);
-        MoveOutcomeDTO moveOutcomeDTO= new MoveOutcomeDTO(gameId,game.getStoneStatuse(),game.getCurrentPlayer(),game.getNextPlayer(),pitId);
-        this.gamePool.put(game.getGameId(),gameMapper.gameToDTO(game));
+        MoveOutcomeDTO moveOutcomeDTO= new MoveOutcomeDTO(gameMapper.gameToDTO(game),selectedPitId);
         log.info("Next player DTO "+gameMapper.gameToDTO(game).getNextPlayer());
         return moveOutcomeDTO;
     }
 
-    public Map<Integer, GameDTO> listAvailableGames(){
-        return gamePool;
+    public List<GameDTO> listAvailableGames(){
+        return gameMapper.gameListToDTOList(gameEntityMapper.gameEntityListToGameList(kalaGameRepository.findAll()));
     }
 
     public Optional<GameDTO> getGame(int gameId){
-        Optional<GameDTO> gameDTO=Optional.ofNullable(gamePool.get(gameId));
-        return gameDTO;
+        //Optional<GameDTO> gameDTO=Optional.ofNullable(gamePool.get(gameId));
+        Optional<GameEntity> gameEntity=kalaGameRepository.findById(gameId);
+        if (gameEntity.isPresent()) {
+            Game game = new Game(gameEntity.get().getId(), gameEntity.get().getPits());
+            return Optional.of(gameMapper.gameToDTO(game));
+        }
+        else
+            return Optional.empty();
+    }
+
+    private void saveState(Game game){
+        GameEntity gameEntity=gameEntityMapper.gameToGameEntity(game);
+        gameEntity.getPits().entrySet().forEach(entry->{
+            if (game.getBoard().getPits().get(entry.getKey())!=entry.getValue())
+                throw new RuntimeException("saving could not be happen");
+        });
+        kalaGameRepository.save(gameEntity);
+
     }
 
     public void delete(int gameId) {
         GameEntity gameEntity= kalaGameRepository.findById(gameId).get();
-        kalaGameRepository.delete(gameEntity);
-        refreshGamingPool();
+        if (gameEntity!=null) {
+            kalaGameRepository.delete(gameEntity);
+        }
+        else
+            throw new IllegalArgumentException("Game does not exists");
     }
 
-    private void saveState( Game game) {
-        GameEntity gameEntity= kalaGameRepository.findById(game.getGameId()).get();
-        gameEntity.setPits(game.getBoard().getPits());
-        kalaGameRepository.save(gameEntity);
-
-    }
-    private void refreshGamingPool(){
-        List<GameEntity> gameEntityList=kalaGameRepository.findAll();
-        this.gamePool=gameEntityList.stream().collect(Collectors.toMap(x->x.getId(),x->gameMapper.gameToDTO(new Game(x.getId(),x.getPits()))));
+    @Transactional
+    public void deleteAll() {
+        kalaGameRepository.findAll().stream().forEach(game->kalaGameRepository.delete(game));
     }
 }

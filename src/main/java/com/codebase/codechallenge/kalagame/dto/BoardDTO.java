@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class BoardDTO {
-    private Map<String, Integer> pits=new TreeMap<>(new NumberStringComparator());
+    private Map<String, Integer> pits=new TreeMap<>();
 
     public BoardDTO() {
     }

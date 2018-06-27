@@ -9,10 +9,15 @@ import com.codebase.codechallenge.kalagame.model.Player;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface GameMapper {
     @Mapping(target="boardDTO",source="game.board")
     GameDTO gameToDTO(Game game);
+
+    List<GameDTO> gameListToDTOList(List<Game> gameList);
+
 
     @Mapping(target="game.board",source="boardDTO")
     Game gameDToGame(GameDTO gameDTO);
