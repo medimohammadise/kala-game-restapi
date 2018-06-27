@@ -5,19 +5,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 public class Player {
-    public void setNumber(int number) {
-        this.number = number;
-    }
-
     /**
      * Player number
      */
     protected int number;
     Logger log= LoggerFactory.getLogger(getClass());
-
     public Player(){
 
     }
+
     /**
      * Create a numbered player
      *
@@ -31,61 +27,88 @@ public class Player {
         return number;
     }
 
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
     /**
-     * Create an outcome representing a particular move.
+     * this is the main method controling whole logic for play
      *
-     * @param player The player making the move (0 or 1)
-     * @param cup    The cup to move (0 to 5)
-     * @param update Notify update listeners of changes to the board
-     * @return If the player ha9s another go
+     * @param selectedPit selected pit to start playing
+     * @param borad
+     * @return next player turn
      */
-    public int doMove(String pit, Board board, boolean update) {
-        if (getPlayerKalaIndex(number).equals(pit))
+    public int doMove(String selectedPit, Board board) {
+        int playerKalaIndex=getPlayerKalaIndex(number); //keep this for the end of stone movement
+
+        /*rule: player can not choose any pit from his/her kala(house) */
+        if (String.valueOf(playerKalaIndex).equals(selectedPit))
             throw new IllegalArgumentException("You can not peak any stone from your house!");
-        Integer nextPlayerId = (number==0?1:0);  //by default next player is opponent player!
-        int numberOfStonesInThePit = board.getPits().get(pit);
-        if (numberOfStonesInThePit == 0)
-            throw new IllegalArgumentException("in this pit=" + pit + " there is no stones to move!");
-        board.clearPit(pit);
-        int pitCounter=Integer.valueOf(pit);
-        for (; numberOfStonesInThePit > 0; numberOfStonesInThePit--) {
-            pitCounter++; //go ahead with subsequet pits couter clockwise
-            if (String.valueOf(pitCounter).equals(getOtherPlayerKalaIndexToAvoid(number))) {
-                pitCounter++; // don't put stone in other players Kala,avoid it!
-                log.info("player "+number+" kala "+pitCounter +" avoided");
+
+        int nextPlayerId = (number==0?1:0);  //by default next player is opponent player!
+
+        int numberOfStonesInTheSelectedPit = board.getPits().get(selectedPit);
+
+        if (numberOfStonesInTheSelectedPit == 0)
+            throw new IllegalArgumentException("in this pit=" + numberOfStonesInTheSelectedPit + " there is no stones to move! Please choose another one.");
+
+        board.clearPit(selectedPit);
+
+        int selectedPitIndex=Integer.valueOf(selectedPit);
+        //start moving
+        for (; numberOfStonesInTheSelectedPit > 0; numberOfStonesInTheSelectedPit--) {
+            selectedPitIndex++; //go ahead with subsequent pits counter clockwise
+
+            // rule : don't put stone in other players Kala,avoid it!
+            if (selectedPitIndex==getKalaIndexForOpponent(number)) {
+                log.info("player "+number+" kala "+selectedPitIndex +" avoided");
+                selectedPitIndex++; // don't put stone in other players Kala,avoid it!
             }
-            if (pitCounter > board.getPits().size())
-                pitCounter = pitCounter - board.getPits().size();
-            log.info("adding stone into pit number "+pitCounter);
-            board.addStoneToPit(String.valueOf(pitCounter));
+
+            //if you reach stone number 13 start agian with number 1
+            if (selectedPitIndex > board.getPits().size())
+                selectedPitIndex = selectedPitIndex - board.getPits().size();
+
+            //it is time to add one stone in the found pit
+            log.info("adding stone into pit number "+selectedPitIndex);
+            board.addStoneToPit(String.valueOf(selectedPitIndex));
         }
-        if (isPlayeMoveLeadToPlayerKala(number, String.valueOf(pitCounter)))
+        if (isPlayerPutLastStoneInHisKala(number, selectedPitIndex))
+            //rule : in this case current player will get free turn next time
             nextPlayerId = number;
-        else if (board.getPits().get(String.valueOf(pitCounter)) == 1) {
-            board.addStoneToPit(getPlayerKalaIndex(number));
-            board.clearPit(String.valueOf(pitCounter));
-            if (board.getPits().get(getOppositPit(String.valueOf(pitCounter))) > 0) {
-                board.addStonesToPit(getPlayerKalaIndex(number), board.getPits().get(getOppositPit(String.valueOf(pitCounter))));
-                board.clearPit(getOppositPit(String.valueOf(pitCounter)));
+
+        else if (board.getPits().get(String.valueOf(selectedPitIndex)) == 1) {
+
+            //rule : if player put last stone in an empty pit , will get a big price as following
+            //first put this stone in your kala
+            board.addStoneToPit(String.valueOf(playerKalaIndex));
+            board.clearPit(String.valueOf(selectedPitIndex));
+
+            //second if in the opponents pit is there any stone or not ? all for you
+            String oppoisitPitIndex=getOppositPitIndex(String.valueOf(selectedPitIndex));
+            int numberOfStonesInOppositePit=board.getPits().get(oppoisitPitIndex);
+            if (numberOfStonesInOppositePit>0) {
+                //get whatever stone in oppoiste index for you
+                board.addStonesToPit(String.valueOf(playerKalaIndex), numberOfStonesInOppositePit);
+                board.clearPit(oppoisitPitIndex);
             }
         }
         return nextPlayerId;
     }
 
-    private boolean isPlayeMoveLeadToPlayerKala(int player, String pit) {
-        return (pit.equals(getPlayerKalaIndex(player)));
+    private boolean isPlayerPutLastStoneInHisKala(int player, int pit) {
+        return pit==getPlayerKalaIndex(player);
 
     }
 
     /**
-     * Is the specified cup index the player's end cup
+     * specifies house or kala for each player
      *
      * @param player The player (0 or 1)
-     * @param cup    The cup board index ( 0 to 13)
      * @return
      */
-    private String getPlayerKalaIndex(int player) {
-        return String.valueOf ((player * 7) + 7); // e.g. 13 or 6
+    private int getPlayerKalaIndex(int player) {
+        return  (player * 7) + 7; // either 7 or 14
     }
 
     /**
@@ -94,28 +117,17 @@ public class Player {
      * @param player The current player (0 or 1)
      * @return The other players end cup index (on the board)
      */
-    private String getOtherPlayerKalaIndexToAvoid(int player) {
-        if (player == 0) // other == 1
-        {
-            return "14";
-        } else
-        // other == 0
-        {
-            return "7";
-        }
+    private int getKalaIndexForOpponent(int player) {
+        if (player == 0)
+            return 14;
+         else
+            return 7;
     }
 
-    /**
-     * -------------->------------------ | | 0 | 1 | 2 | 3 | 4 | 5 | | Player 1
-     * |13 |-----------------------| 6 | | |12 |11 |10 | 9 | 8 | 7 | | Player 2
-     * -------------- <------------------
-     * <p>
-     * cup opposite 3 9 0 12 5 7 11 1
-     *
-     * @param cup
-     * @return
+    /*
+       get opposite pit for the selected one
      */
-    private String getOppositPit(String pit) {
+    private String getOppositPitIndex(String pit) {
         int pitIndex=Integer.valueOf(pit);
         if (pitIndex>7)
             return String.valueOf(pitIndex-7);
@@ -123,8 +135,6 @@ public class Player {
            return String.valueOf(pitIndex+7);
 
     }
-
-
 
     public  boolean checkChoosenPitValidForMove(Board board,String choosenPit){
         List<String> AvailablePitsForMove =board.getAvailablePitsForMove(number);

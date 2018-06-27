@@ -31,13 +31,13 @@ public class KalaGameResource {
 
    @RequestMapping(method=RequestMethod.PUT,value = "/{gameId}/pits/{pitId}")
    public ResponseEntity<MoveOutcomeDTO> move(@PathVariable Integer gameId, @PathVariable String pitId) throws URISyntaxException {
-      return new ResponseEntity<> (kalaGameService.doMove(gameId,pitId), HttpStatus.OK);
+      return new ResponseEntity<> (kalaGameService.doMoveStones(gameId,pitId), HttpStatus.OK);
    }
 
    @RequestMapping(method=RequestMethod.GET)
    public ResponseEntity<List<GameDTO>> listAvailableGames(){
 
-      List<GameDTO> allGames= kalaGameService.listAvailableGames();
+      List<GameDTO> allGames= kalaGameService.listAllAvailableGames();
       if (allGames.size()>0)
          return new ResponseEntity<>(allGames,HttpStatus.OK);
       else

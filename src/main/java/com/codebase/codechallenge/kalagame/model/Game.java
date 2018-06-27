@@ -1,6 +1,6 @@
 package com.codebase.codechallenge.kalagame.model;
 
-import com.codebase.codechallenge.kalagame.domain.GameEntity;
+import com.codebase.codechallenge.kalagame.enums.GameStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +13,7 @@ public class Game {
     Player[] players=new Player[2];
     int currentPlayer=-1;
     int nextPlayer=-1;
+    GameStatus status;
 
     public void setCurrentPlayer(int currentPlayer) {
         this.currentPlayer = currentPlayer;
@@ -32,13 +33,7 @@ public class Game {
         players[1]=new Player(1);
 
     }
-    public Game(int gameId,Map<String,Integer> pits) {
-        this.gameId = gameId;
-        //TODO pass game state to the board
-        this.board=new Board(gameId,pits);
-        players[0]=new Player(0);
-        players[1]=new Player(1);
-    }
+
 
     public Integer getGameId() {
         return gameId;
@@ -64,19 +59,24 @@ public class Game {
         this.players = players;
     }
 
-    public void doMove(String pitId) {
+    public void doMoveStones(String selectedPitId) {
         if (!board.isGameOver()) {
-            log.info("currentPlayer " + currentPlayer + " nextPlayer " + nextPlayer);
-            int requestedPlayerId = board.whoIsThisPit(pitId);
+            status=GameStatus.IN_PROGRESS;
+            int requestedPlayerId = board.whoIsThisPit(selectedPitId);
+            log.info("requested pits belongs to player  " + requestedPlayerId);
+
             if (nextPlayer != -1 && requestedPlayerId != nextPlayer)
                 throw new IllegalArgumentException("It is not your turn, it is player= " + nextPlayer + " turn!");
             else
                 currentPlayer = requestedPlayerId;
-            log.info("currentPlayer playing ---> " + currentPlayer);
-            nextPlayer = players[currentPlayer].doMove(pitId, board, false);
+            log.info("asking player object "+currentPlayer+" to play!");
+            nextPlayer = players[currentPlayer].doMove(selectedPitId, board);
+            log.info("next player should be " + nextPlayer);
+            if (board.isGameOver()) status=GameStatus.OVER;
         }
         else
             throw new IllegalArgumentException("game is over");
+
     }
     public Map<String,Integer> getStoneStatuse(){
         return board.getPits();
@@ -85,4 +85,11 @@ public class Game {
         return currentPlayer;
     }
 
+    public GameStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(GameStatus status) {
+        this.status = status;
+    }
 }

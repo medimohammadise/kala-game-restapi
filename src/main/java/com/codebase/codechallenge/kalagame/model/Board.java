@@ -19,23 +19,25 @@ public class Board {
     public void setGameId(Integer gameId) {
         this.gameId = gameId;
     }
-    public Board(){
+
+    public Board() {
 
 
     }
+
     /**
      * Initialise the Board
      */
-    public Board(Integer gameId,Map<String, Integer> pits) {
-            this.gameId=gameId;
-           this.pits=pits;
+    public Board(Integer gameId, Map<String, Integer> pits) {
+        this.gameId = gameId;
+        this.pits = pits;
     }
 
     /**
      * The board index of a players
      *
      * @param player The player (0 or 1)
-     * @param pits    The cup index (1 to 6)
+     * @param pits   The cup index (1 to 6)
      * @return The real index of the cup (0 to 13)
      */
     private String getPitIndexForPlayer(int player, String pit) {
@@ -45,15 +47,15 @@ public class Board {
     }
 
     /**
-     * @param pit
+     * @param pitIndex
      * @return 0 for player 0 and 1 for player 1
      */
-    protected int whoIsThisPit(String pit) {
-        return Integer.valueOf(pit) > 7 ? 1 : 0; // player = 1;
+    protected int whoIsThisPit(String pitIndex) {
+        return Integer.valueOf(pitIndex) > 7 ? 1 : 0; // player = 1;
     }
 
     /**
-     * Add a bead to a cup at the given index
+     * Add a stone to a pit at the given index
      *
      * @param index
      */
@@ -62,17 +64,17 @@ public class Board {
     }
 
     /**
-     * Add a bead to a cup at the given index
+     * Add numberOfStonesToAdd stones to a pit at the given index
      *
      * @param index
      */
-    public void addStonesToPit(String index,int numberofStonesToAdd) {
-        pits.put(index, pits.get(index) + numberofStonesToAdd);
+    public void addStonesToPit(String index, int numberOfStonesToAdd) {
+        pits.put(index, pits.get(index) + numberOfStonesToAdd);
     }
 
 
     /**
-     * Clear the beads in a given cup
+     * Clear the stones in a given pit
      *
      * @param index
      */
@@ -87,29 +89,28 @@ public class Board {
 
     /**
      * The game is over if on this board either player can make no more moves.
-     * That is if either player has any normal cups with beads in the game is
+     * That is if either player has any normal stones with pits in the game is
      * not over
      *
      * @return true If the game is over
      */
     public boolean isGameOver() {
-        return (pits.entrySet().stream().filter(pit -> Integer.valueOf(pit.getKey()) < 7 && pit.getValue() == 0).count() ==6
-                ||
-                pits.entrySet().stream().filter(pit -> Integer.valueOf(pit.getKey()) <14  && Integer.valueOf(pit.getKey()) > 7 && pit.getValue() == 0).count() == 6);
+        return (pits.entrySet().stream().filter(pit -> Integer.valueOf(pit.getKey()) < 7 && pit.getValue() == 0).count() == 6 ||
+                pits.entrySet().stream().filter(pit -> Integer.valueOf(pit.getKey()) < 14 && Integer.valueOf(pit.getKey()) > 7 && pit.getValue() == 0).count() == 6);
     }
 
     /**
      * The available cups to "move" for a player
      *
-     * @param player The player number (1 or 2)
-     * @return An array containing the indexes of the cups that can be moved by a
+     * @param player The player number (0 or 1)
+     * @return An array containing the indexes of the pits that can be moved by a
      * player
      */
     public List<String> getAvailablePitsForMove(int player) {
         List<String> availablePitsForMove = new ArrayList();
-        String availableIndex="";
+        String availableIndex = "";
         for (int i = 1; i < 7; i++) {
-            availableIndex=getPitIndexForPlayer(player, String.valueOf(i));
+            availableIndex = getPitIndexForPlayer(player, String.valueOf(i));
             if (pits.get(availableIndex) > 0) {
                 // add a new move
                 availablePitsForMove.add(availableIndex);

@@ -38,54 +38,63 @@ public class KalaGameService {
     @Transactional
     public Integer createGame() {
         GameEntity gameEntity=new GameEntity();
-        Map<String, Integer> pits = new TreeMap<>();
-        IntStream.range(1, 14).forEach(i -> pits.put(String.valueOf(i), 6));
-        pits.put("7", 0);
-        pits.put("14", 0);
-        pits.entrySet().stream().forEach(e->System.out.println(e.getKey()+" - > "+e.getValue()));
-        gameEntity.setPits(pits);
+        gameEntity.setPits(prepareAndInitializePits());
         kalaGameRepository.save(gameEntity);
-        Game game = new Game(gameEntity.getId(),gameEntity.getPits());
         return gameEntity.getId();
     }
 
+    private  Map<String, Integer> prepareAndInitializePits(){
+        Map<String, Integer> pits = new TreeMap<>();
+        //prepare and initialize pits
+        IntStream.range(1, 14).forEach(i -> pits.put(String.valueOf(i), 6));
+        pits.put("7", 0); //house for player 1
+        pits.put("14", 0);//house for player 2
+        return pits;
+    }
+
     @Transactional
-    public MoveOutcomeDTO doMove(int gameId, String selectedPitId) throws URISyntaxException {
+    public MoveOutcomeDTO doMoveStones(int gameId, String selectedPitId) throws URISyntaxException {
         Optional<GameEntity> gameEntity=kalaGameRepository.findById(gameId);
         if (!gameEntity.isPresent()) throw new IllegalArgumentException("Game does not exists");
+
+        //get business Game Model
         Game game=gameEntityMapper.gameEntityToGame(gameEntity.get());
-        game.doMove(selectedPitId);
-        saveState(game);
+        game.doMoveStones(selectedPitId);
+        saveGameState(game);
         MoveOutcomeDTO moveOutcomeDTO= new MoveOutcomeDTO(gameMapper.gameToDTO(game),selectedPitId);
-        log.info("Next player DTO "+gameMapper.gameToDTO(game).getNextPlayer());
         return moveOutcomeDTO;
     }
 
-    public List<GameDTO> listAvailableGames(){
+    public List<GameDTO> listAllAvailableGames(){
         return gameMapper.gameListToDTOList(gameEntityMapper.gameEntityListToGameList(kalaGameRepository.findAll()));
     }
 
+    /*
+         gets's game by gameId
+     */
     public Optional<GameDTO> getGame(int gameId){
         //Optional<GameDTO> gameDTO=Optional.ofNullable(gamePool.get(gameId));
         Optional<GameEntity> gameEntity=kalaGameRepository.findById(gameId);
         if (gameEntity.isPresent()) {
-            Game game = new Game(gameEntity.get().getId(), gameEntity.get().getPits());
+            Game game = gameEntityMapper.gameEntityToGame(gameEntity.get());
             return Optional.of(gameMapper.gameToDTO(game));
         }
         else
             return Optional.empty();
     }
 
-    private void saveState(Game game){
+    /*
+       saves Game business model state in database
+    */
+    private void saveGameState(Game game){
         GameEntity gameEntity=gameEntityMapper.gameToGameEntity(game);
-        gameEntity.getPits().entrySet().forEach(entry->{
-            if (game.getBoard().getPits().get(entry.getKey())!=entry.getValue())
-                throw new RuntimeException("saving could not be happen");
-        });
         kalaGameRepository.save(gameEntity);
 
     }
 
+    /*
+           delete game from database by gameId
+    */
     public void delete(int gameId) {
         GameEntity gameEntity= kalaGameRepository.findById(gameId).get();
         if (gameEntity!=null) {
@@ -95,6 +104,9 @@ public class KalaGameService {
             throw new IllegalArgumentException("Game does not exists");
     }
 
+    /*
+              cleanup all games in database
+     */
     @Transactional
     public void deleteAll() {
         kalaGameRepository.findAll().stream().forEach(game->kalaGameRepository.delete(game));

@@ -1,12 +1,10 @@
 package com.codebase.codechallenge.kalagame.domain;
 
-import com.codebase.codechallenge.kalagame.utils.NumberStringComparator;
+import com.codebase.codechallenge.kalagame.enums.GameStatus;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.IntStream;
 
 @Entity(name="game")
 public class GameEntity {
@@ -23,6 +21,11 @@ public class GameEntity {
     @Column(name = "pit_value")
     @BatchSize(size = 14)
     Map<String,Integer> pits;
+
+    int currentPlayer;
+
+    @Enumerated(EnumType.STRING)
+    GameStatus status=GameStatus.CREATED;
 
     public GameEntity() {
 
@@ -47,5 +50,21 @@ public class GameEntity {
 
     public void setPits(Map<String, Integer> pits) {
         this.pits = pits;
+    }
+
+    public int getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public void setCurrentPlayer(int currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public GameStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(GameStatus status) {
+        this.status = status;
     }
 }
