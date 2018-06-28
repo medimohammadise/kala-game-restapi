@@ -1,7 +1,9 @@
 package com.codebase.codechallenge.kalagame.dto;
 
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 
 public class GameCreatedDTO {
     int id;
@@ -9,7 +11,13 @@ public class GameCreatedDTO {
 
     public GameCreatedDTO(int id, URI uri) throws URISyntaxException {
         this.id = id;
-        this.uri = new URI("/games/"+String.valueOf(id));
+        try {
+            this.uri=new URI("http://" + InetAddress.getLocalHost().getHostAddress()+"/"+"games/"+String.valueOf(id));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     public int getId() {
