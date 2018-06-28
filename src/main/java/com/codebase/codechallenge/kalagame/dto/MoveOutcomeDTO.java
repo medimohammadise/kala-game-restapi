@@ -19,13 +19,12 @@ public class MoveOutcomeDTO {
     }
     public MoveOutcomeDTO(GameDTO gameDTO, String selectedPitIndex) throws URISyntaxException {
         this.gameId = gameDTO.getGameId();
-        this.gameURL = new URI("/games/"+gameDTO.getGameId()+"/"+"pits/"+selectedPitIndex);
         this.pitsStatus = gameDTO.getBoardDTO().getPits();
         this.currentPalyer=gameDTO.getCurrentPlayer();
         this.nextPlayerTurn=gameDTO.getNextPlayer();
         this.selectedPitIndex=selectedPitIndex;
         try {
-            this.gameURL=new URI("https://" +InetAddress.getLocalHost().getHostAddress()+"/"+"games/"+String.valueOf(gameId)+"/pits/"+selectedPitIndex);
+            this.gameURL=new URI("http://" +InetAddress.getLocalHost().getHostAddress()+"/"+"games/"+String.valueOf(gameId)+"/pits/"+selectedPitIndex);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {

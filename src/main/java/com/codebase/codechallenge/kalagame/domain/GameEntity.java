@@ -23,6 +23,7 @@ public class GameEntity {
     Map<String,Integer> pits;
 
     int currentPlayer;
+    int nextPlayer;
 
     @Enumerated(EnumType.STRING)
     GameStatus status=GameStatus.CREATED;
@@ -66,5 +67,13 @@ public class GameEntity {
 
     public void setStatus(GameStatus status) {
         this.status = status;
+    }
+
+    public int getNextPlayer() {
+        return nextPlayer;
+    }
+
+    public void setNextPlayer(int nextPlayer) {
+        this.nextPlayer = nextPlayer;
     }
 }
