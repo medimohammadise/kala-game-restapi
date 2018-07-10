@@ -5,6 +5,8 @@ import com.codebase.codechallenge.kalagame.dto.GameDTO;
 import com.codebase.codechallenge.kalagame.dto.MoveOutcomeDTO;
 import com.codebase.codechallenge.kalagame.model.Game;
 import com.codebase.codechallenge.kalagame.service.KalaGameService;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.springframework.hateoas.core.DummyInvocationUtils.methodOn;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+
+
 @RestController
 @RequestMapping("/games")
 public class KalaGameResource {
@@ -25,10 +31,13 @@ public class KalaGameResource {
 
    }
    @RequestMapping(method=RequestMethod.POST)
-   public ResponseEntity<GameCreatedDTO> createGame() throws URISyntaxException {
+   public ResponseEntity<Resource<GameCreatedDTO>> createGame() throws URISyntaxException {
       int gameId= kalaGameService.createGame();
       URI location=ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(gameId).toUri();
-      return  ResponseEntity.created(location).build();
+      Resource<GameCreatedDTO> gameCreatedDTOResource=new Resource<GameCreatedDTO>(new GameCreatedDTO(gameId));
+      ControllerLinkBuilder link=linkTo(methodOn(this.getClass()).listAvailableGames().getBody());
+       gameCreatedDTOResource.add(link.withRel("games"));
+      return  ResponseEntity.created(location).body(gameCreatedDTOResource);
    }
 
    @RequestMapping(method=RequestMethod.PUT,value = "/{gameId}/pits/{pitId}")
