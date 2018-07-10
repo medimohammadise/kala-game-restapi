@@ -8,6 +8,7 @@ import com.codebase.codechallenge.kalagame.service.KalaGameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,7 +27,8 @@ public class KalaGameResource {
    @RequestMapping(method=RequestMethod.POST)
    public ResponseEntity<GameCreatedDTO> createGame() throws URISyntaxException {
       int gameId= kalaGameService.createGame();
-      return new ResponseEntity<> (new GameCreatedDTO (gameId,new URI("/games/"+String.valueOf(gameId))),HttpStatus.CREATED);
+      URI location=ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(gameId).toUri();
+      return  ResponseEntity.created(location).build();
    }
 
    @RequestMapping(method=RequestMethod.PUT,value = "/{gameId}/pits/{pitId}")

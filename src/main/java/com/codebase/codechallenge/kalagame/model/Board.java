@@ -60,7 +60,8 @@ public class Board {
      * @param index
      */
     public void addStoneToPit(String index) {
-        pits.put(index, pits.get(index) + 1);
+        pits.merge(index,1,(oldValue,value)->oldValue+value);
+        //pits.put(index, pits.get(index) + 1);
     }
 
     /**
@@ -69,7 +70,8 @@ public class Board {
      * @param index
      */
     public void addStonesToPit(String index, int numberOfStonesToAdd) {
-        pits.put(index, pits.get(index) + numberOfStonesToAdd);
+        pits.merge(index,numberOfStonesToAdd,(oldValue,value)->oldValue+value);
+        //pits.put(index, pits.get(index) + numberOfStonesToAdd);
     }
 
 
