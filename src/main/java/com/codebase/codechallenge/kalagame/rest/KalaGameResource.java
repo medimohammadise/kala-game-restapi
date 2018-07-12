@@ -5,6 +5,9 @@ import com.codebase.codechallenge.kalagame.dto.GameDTO;
 import com.codebase.codechallenge.kalagame.dto.MoveOutcomeDTO;
 import com.codebase.codechallenge.kalagame.model.Game;
 import com.codebase.codechallenge.kalagame.service.KalaGameService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping("/games")
+
 public class KalaGameResource {
    KalaGameService kalaGameService;
    public KalaGameResource(KalaGameService kalaGameService){
